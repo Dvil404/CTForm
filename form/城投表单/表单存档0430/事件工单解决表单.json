@@ -1,0 +1,52 @@
+{
+    "type": "object",
+    "properties": {
+        "resouce": {
+            "id": "resouce",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 0,
+            "title": "事件原因",
+            "required": true
+        },
+        "process": {
+            "id": "process",
+            "type": "string",
+            "widget": {
+                "id": "textarea"
+            },
+            "inputClass": "",
+            "index": 1,
+            "title": "解决过程",
+            "required": true
+        },
+        "schemaFormValid": {
+            "hidden": true,
+            "type": "boolean",
+            "default": false,
+            "condition": "1 === 2",
+            "widget": {
+                "id": "hidden"
+            }
+        }
+    },
+    "fieldsets": [
+        {
+            "id": "fieldset-default",
+            "title": "",
+            "description": "",
+            "name": "",
+            "fields": [
+                "resouce",
+                "process",
+                "schemaFormValid"
+            ]
+        }
+    ],
+    "widget": {
+        "id": "object"
+    }
+}

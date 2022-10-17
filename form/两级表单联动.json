@@ -1,0 +1,108 @@
+{
+    "type": "object",
+    "properties": {
+        "businessgroup": {
+            "id": "businessgroup",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 0,
+            "title": "部门名称",
+            "selectDatas": [
+                {
+                    "id": "dev",
+                    "name": "开发部"
+                },
+                {
+                    "id": "test",
+                    "name": "测试部"
+                }
+            ],
+            "required": true
+        },
+        "testgroup": {
+            "id": "testgroup",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 1,
+            "title": "小组名称",
+            "default": "测试组1",
+            "selectDatas": [
+                {
+                    "id": "测试组1",
+                    "name": "测试组1"
+                },
+                {
+                    "id": "测试组2",
+                    "name": "测试组2"
+                }
+            ],
+            "condition": "model.businessgroup === 'test'",
+            "visibleIf": {
+                "businessgroup": [
+                    "test"
+                ]
+            },
+            "required": true
+        },
+        "devgroup": {
+            "id": "devgroup",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 2,
+            "title": "小组名称",
+            "default": "开发组1",
+            "selectDatas": [
+                {
+                    "id": "开发组1",
+                    "name": "开发组1"
+                },
+                {
+                    "id": "开发组2",
+                    "name": "开发组2"
+                }
+            ],
+            "condition": "model.businessgroup === 'dev'",
+            "visibleIf": {
+                "businessgroup": [
+                    "dev"
+                ]
+            },
+            "required": true
+        },
+        "schemaFormValid": {
+            "hidden": true,
+            "type": "boolean",
+            "default": false,
+            "condition": "1 === 2",
+            "widget": {
+                "id": "hidden"
+            }
+        }
+    },
+    "fieldsets": [
+        {
+            "id": "fieldset-default",
+            "title": "",
+            "description": "",
+            "name": "",
+            "fields": [
+                "businessgroup",
+                "testgroup",
+                "devgroup",
+                "schemaFormValid"
+            ]
+        }
+    ],
+    "widget": {
+        "id": "object"
+    }
+}

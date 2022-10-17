@@ -1,0 +1,46 @@
+{
+    "roleToHierarchyInstanceList":[
+        {
+            "roleId":"ROLE_TENANT_USER",
+            "hierarchyInstanceId":"default"
+        },
+        {
+            "roleId":"ROLE_BUSINESS_GROUP_USER",
+            "hierarchyInstanceId":"2919bbe9-031a-4fb4-88da-5357fe8bb3ed"
+        }
+    ],
+    "user":{
+    "id": "158fa4cf-154b-43a3-9c02-8c68e4a96cd1",
+    "deleted": False,
+    "createdDate": 1618559564849,
+    "createdBy": "sysadmin",
+    "updatedDate": 1620873845247,
+    "updatedBy": "sysadmin",
+    "deletedTimestamp": 0,
+    "lockVersion": 19,
+    "exts": {},
+    "loginId": "ctgllanyong",
+    "name": "兰勇",
+    "email": "ctgllanyong@chengtou.com",
+    "phone": "13816318485",
+    "qqNumber": "",
+    "wechat": "",
+    "dingTalk": "",
+    "contactUserName": "",
+    "contactUserEmail": "",
+    "authorized": False,
+    "internal": False,
+    "companyName": "",
+    "tenantId": "default",
+    "encrypted": False,
+    "disabled": False,
+    "loginType": "OAuth2",
+    "ou": "",
+    "dueDate": "",
+    "iconId": "",
+    "lastLogin": "",
+    "currentLogin": 1620873845245,
+    "loginFailTimes": 0,
+    "locked": False,
+    "invitationCode": "OxvyDzVv"
+    }}

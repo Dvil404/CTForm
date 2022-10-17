@@ -1,0 +1,448 @@
+{
+    "type": "object",
+    "properties": {
+        "FunctionArea": {
+            "id": "FunctionArea",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 0,
+            "title": "功能区",
+            "required": true
+        },
+        "resType": {
+            "id": "resType",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 1,
+            "title": "资源类型",
+            "required": true
+        },
+        "snapFullBackDate": {
+            "id": "snapFullBackDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 2,
+            "title": "快照全备周期",
+            "required": true
+        },
+        "snapIncreaseDate": {
+            "id": "snapIncreaseDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 3,
+            "title": "快照增备周期",
+            "required": true
+        },
+        "snapStartTime": {
+            "id": "snapStartTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 4,
+            "title": "快照执行开始时间",
+            "required": true
+        },
+        "snapEndTime": {
+            "id": "snapEndTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 5,
+            "title": "快照执行结束时间",
+            "required": true
+        },
+        "retentionTime": {
+            "id": "retentionTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 6,
+            "title": "快照保留时间",
+            "required": true
+        },
+        "backupFilePath": {
+            "id": "backupFilePath",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 7,
+            "title": "快照备份路径",
+            "required": true
+        },
+        "backupFile": {
+            "id": "backupFile",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 8,
+            "title": "备份大小",
+            "required": true
+        },
+        "fileFullBackDate": {
+            "id": "fileFullBackDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 9,
+            "title": "全备周期",
+            "required": true
+        },
+        "fileIncreaseDate": {
+            "id": "fileIncreaseDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 10,
+            "title": "增备周期",
+            "required": true
+        },
+        "fileStartTime": {
+            "id": "fileStartTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 11,
+            "title": "文件备份执行开始时间",
+            "required": true
+        },
+        "fileEndTime": {
+            "id": "fileEndTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 12,
+            "title": "文件备份执行结束时间",
+            "required": true
+        },
+        "fileTime": {
+            "id": "fileTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 13,
+            "title": "文件备份保留时间",
+            "required": true
+        },
+        "dataSourceVersion": {
+            "id": "dataSourceVersion",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 14,
+            "title": "数据库版本",
+            "required": true
+        },
+        "dataSourceNmae": {
+            "id": "dataSourceNmae",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 15,
+            "title": "数据库名称",
+            "required": true
+        },
+        "dataSourcePort": {
+            "id": "dataSourcePort",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 16,
+            "title": "数据库端口",
+            "required": true
+        },
+        "dataFullBackDate": {
+            "id": "dataFullBackDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 17,
+            "title": "数据库全备周期",
+            "required": true
+        },
+        "dataIncreaseDate": {
+            "id": "dataIncreaseDate",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 18,
+            "title": "数据库增备周期",
+            "required": true
+        },
+        "dataStartTime": {
+            "id": "dataStartTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 19,
+            "title": "数据库备份执行开始时间",
+            "required": true
+        },
+        "dataEndTime": {
+            "id": "dataEndTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 20,
+            "title": "数据库备份执行结束时间",
+            "required": true
+        },
+        "dataTime": {
+            "id": "dataTime",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 21,
+            "title": "数据库备份保留时间",
+            "required": true
+        },
+        "use": {
+            "id": "use",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 22,
+            "title": "服务器用途",
+            "required": true
+        },
+        "deploymentType": {
+            "id": "deploymentType",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 23,
+            "title": "部署方式",
+            "required": true
+        },
+        "wwwAccept": {
+            "id": "wwwAccept",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 24,
+            "title": "互联网开放",
+            "required": true
+        },
+        "operator": {
+            "id": "operator",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 25,
+            "title": "运维负责人",
+            "required": true
+        },
+        "appPrincipal": {
+            "id": "appPrincipal",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 26,
+            "title": "应用负责人",
+            "required": true
+        },
+        "ispLevel": {
+            "id": "ispLevel",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 27,
+            "title": "等保系统级别",
+            "required": true
+        },
+        "softwareDev": {
+            "id": "softwareDev",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 28,
+            "title": "软件开发商",
+            "required": true
+        },
+        "softwareMaintain": {
+            "id": "softwareMaintain",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 29,
+            "title": "软件维护商",
+            "required": true
+        },
+        "amount": {
+            "id": "amount",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 30,
+            "title": "台数",
+            "required": true
+        },
+        "localDisk": {
+            "id": "localDisk",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 31,
+            "title": "本地磁盘",
+            "required": true
+        },
+        "extStorage": {
+            "id": "extStorage",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 32,
+            "title": "是否外挂存储",
+            "required": true
+        },
+        "softwareVersion": {
+            "id": "softwareVersion",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 33,
+            "title": "软件版本信息",
+            "required": true
+        },
+        "note": {
+            "id": "note",
+            "type": "string",
+            "widget": {
+                "id": "string"
+            },
+            "inputClass": "",
+            "index": 34,
+            "title": "备注",
+            "required": true
+        },
+        "schemaFormValid": {
+            "hidden": true,
+            "type": "boolean",
+            "default": false,
+            "condition": "1 === 2",
+            "widget": {
+                "id": "hidden"
+            }
+        }
+    },
+    "fieldsets": [
+        {
+            "id": "fieldset-default",
+            "title": "",
+            "description": "",
+            "name": "",
+            "fields": [
+                "FunctionArea",
+                "resType",
+                "snapFullBackDate",
+                "snapIncreaseDate",
+                "snapStartTime",
+                "snapEndTime",
+                "retentionTime",
+                "backupFilePath",
+                "backupFile",
+                "fileFullBackDate",
+                "fileIncreaseDate",
+                "fileStartTime",
+                "fileEndTime",
+                "fileTime",
+                "dataSourceVersion",
+                "dataSourceNmae",
+                "dataSourcePort",
+                "dataFullBackDate",
+                "dataIncreaseDate",
+                "dataStartTime",
+                "dataEndTime",
+                "dataTime",
+                "use",
+                "deploymentType",
+                "wwwAccept",
+                "operator",
+                "appPrincipal",
+                "ispLevel",
+                "softwareDev",
+                "softwareMaintain",
+                "amount",
+                "localDisk",
+                "extStorage",
+                "softwareVersion",
+                "note",
+                "schemaFormValid"
+            ]
+        }
+    ],
+    "widget": {
+        "id": "object"
+    }
+}

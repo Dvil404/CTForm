@@ -1,0 +1,106 @@
+properties:
+   FunctionArea:
+      alias: 功能区
+      type: string
+   resType:
+      alias: 资源类型
+      type: string
+   snapFullBackDate: 
+      alias: 快照全备周期
+      type: string
+   snapIncreaseDate:
+      alias: 快照增备周期
+      type: string
+   snapStartTime:
+      alias: 快照执行开始时间
+      type: string
+   snapEndTime:
+      alias: 快照执行结束时间
+      type: string
+   retentionTime:
+      alias: 快照保留时间
+      type: string
+   backupFilePath:
+      alias: 快照备份路径
+      type: string
+   backupFile:
+      alias: 备份大小
+      type: integer
+   fileFullBackDate:
+      alias: 全备周期
+      type: string
+   fileIncreaseDate:
+      alias: 增备周期
+      type: string
+   fileStartTime:
+      alias: 备份执行开始时间
+      type: string
+   fileEndTime:
+      alias: 备份执行结束时间
+      type: string
+   fileTime:
+      alias: 文件备份保留时间
+      type: string
+   dataSourceVersion:
+      alias: 数据库版本
+      type: string
+   dataSourceNmae:
+      alias: 数据库名称
+      type: string
+   dataSourcePort:
+      alias: 数据库端口
+      type: string
+   dataFullBackDate:
+      alias: 数据库全备周期
+      type: string
+   dataIncreaseDate:
+      alias: 数据库增备周期
+      type: string
+   dataStartTime:
+      alias: 数据库备份执行开始时间
+      type: string
+   dataEndTime:
+      alias: 数据库备份执行结束时间
+      type: string
+   dataTime:
+      alias: 数据库备份保留时间
+      type: string
+   use: 
+      alias: 服务器用途
+      type: string
+   deploymentType:
+      alias: 部署方式
+      type: string
+   wwwAccept:
+      alias: 互联网开放
+      type: string
+   operator:
+      alias: 运维负责人
+      type: string
+   appPrincipal:
+      alias: 应用负责人
+      type: string
+   ispLevel:
+      alias: 等保系统级别
+      type: string
+   softwareDev:
+      alias: 软件开发商
+      type: string
+   softwareMaintain:
+      alias: 软件维护商
+      type: string
+   amount:
+      alias: 台数
+      type: integer
+   localDisk:
+      alias: 本地磁盘
+      type: string
+   extStorage:
+      alias: 是否外挂存储
+      type: string
+   softwareVersion:
+      alias: 软件版本信息
+      type: string
+   note:
+      alias: 备注
+      type: string

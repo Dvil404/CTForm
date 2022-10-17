@@ -1,0 +1,15 @@
+"tongbaoduixiang": {
+    "type": "string",
+    "title": "处理人",
+    "config": {
+        "value": {
+            "expression": "/groups?expand",
+            "method": "GET",
+            "source": "api"
+        }
+    },
+    "widget": {
+        "id": "select"
+    },
+    "selectDatas": []
+},

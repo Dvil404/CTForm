@@ -1,0 +1,715 @@
+1、停止tomcat服务
+2、备份数据库
+3、备份自定义的组件、配置文件
+
+4、升级第三方应用
+5、分三步升级tomcat的war和components
+5.2-->  5.5 --> 6.5
+
+6、升级步骤
+
+一、升级consul
+# 1. 停止consul服务
+systemctl stop cloudchef-consul
+# 2. 备份老板本consul
+rm -rf /opt/cloudchef/consul/consul-bak
+cp -r /opt/cloudchef/consul/consul /opt/cloudchef/consul/consul-bak
+# 3. 下载新包
+ consul_1.9.3_linux_amd64.zip
+# 4. 解压替换
+unzip consul_1.9.3_linux_amd64.zip -d /opt/cloudchef/consul
+# Enter yes to overwrite old consul
+# 5. 修改所有者
+chown consul:consul /opt/cloudchef/consul/consul
+# 6. 启动服务
+systemctl start cloudchef-consul
+# 7. 检查服务
+systemctl status cloudchef-consul
+# 8. [慎重]服务正常后，删除备份的文件
+rm -rf  /opt/cloudchef/consul/consul-bak
+rm -rf consul_1.7.3_linux_amd64.zip
+
+二、升级MySQL
+
+mysql-community-server-8.0.23-1.el7.x86_64.rpm
+mysql-community-common-8.0.23-1.el7.x86_64.rpm
+mysql-community-devel-8.0.23-1.el7.x86_64.rpm
+mysql-community-libs-8.0.23-1.el7.x86_64.rpm
+mysql-community-client-8.0.23-1.el7.x86_64.rpm
+mysql-community-client-plugins-8.0.23-1.el7.x86_64.rpm
+
+##########HA环境：##########
+
+# 假设mysql的rpm都放在mysql这目录，执行以下命令升级
+# mysql目录需要包含5个RPM包: server, common, devel, libs, client，client-plugins
+rpm -Uvh mysql/*.rpm
+# 安装完成后，主从节点都需要重启mysql服务
+systemctl restart mysqld 
+# 重启完mysql之后，如果有服务访问异常，需要重启对应app service
+
+CMP节点：
+# 假设mysql的rpm都放在mysql这目录，执行以下命令升级
+# mysql目录需要包含4个RPM包：common, devel, libs, client，client-plugins
+# 不需要安装mysql-community-server这个rpm包
+rpm -Uvh mysql/*.rpm
+
+##########单节点：############
+
+# 假设mysql的rpm都放在mysql这目录，执行以下命令升级
+# mysql目录需要包含5个RPM包: server, common, devel, libs, client，client-plugins
+rpm -Uvh mysql/*.rpm
+# 安装完成后，主从节点都需要重启mysql服务
+systemctl restart mysqld
+# 重启完mysql之后，如果有服务访问异常，需要重启对应app service
+################################
+
+三、升级nginx
+
+nginx-1.20.1-1.el7.ngx.x86_64.rpm
+
+yum -y install nginx-1.20.1-1.el7.ngx.x86_64.rpm
+
+systemctl restart nginx
+
+四、升级logstash
+
+# 1、停止服务 
+systemctl stop logstash
+
+# 2、安装rpm包
+yum install -y logstash-7.12.1-x86_64.rpm
+
+# 3、更新logstash.yml内容
+
+path.data: /opt/cloudchef/logstash
+pipeline.ordered: auto
+path.logs: /var/log/cloudchef/logstash
+
+# 4、更新logstash.conf内容
+#注意事项：
+#1、HA环境需要替换127.0.0.1:3306为MySQL VIP:3306  
+#2、若没有/etc/cloudchef/configs/ssl/cloudify_internal.p12这个路径文件，需要改为/etc/cloudify/ssl/cloudify_internal.p12
+#3、以下两处的 ssl_certificate_password => "c10udch3f"  的密码要修改为  ssl_certificate_password => "cloudify"
+
+#配置文件内容：
+#############
+# Note that localhost is assumed for RabbitMQ by default
+# and should be replaced using a relationship operation if they're not on the same host.
+
+# We provide 2 inputs, one for events and one for logs.
+input {
+    heartbeat {
+        tags => ["heartbeat"]
+        type => "heartbeat"
+        message => "epoch"
+        interval => 15
+    }
+    rabbitmq {
+        tags => ["log"]
+        queue => "cloudify-logs"
+        exchange => "cloudify-logs"
+        host => "127.0.0.1"
+        port => "5671"
+        ssl => "true"
+        ssl_certificate_path => "/etc/cloudchef/configs/ssl/cloudify_internal.p12"
+        ssl_certificate_password => "c10udch3f"
+        durable => "true"
+        exclusive => "false"
+        user => "cloudchef"
+        password => "c10udch3f"
+    }
+    rabbitmq {
+        tags => ["event"]
+        queue => "cloudify-events"
+        exchange => "cloudify-events"
+        host => "127.0.0.1"
+        port => "5671"
+        ssl => "true"
+        ssl_certificate_path => "/etc/cloudchef/configs/ssl/cloudify_internal.p12"
+        ssl_certificate_password => "c10udch3f"
+        durable => "true"
+        exclusive => "false"
+        user => "cloudchef"
+        password => "c10udch3f"
+    }
+    # This allows us to verify that logstash is running.
+    # it is non-functional for the manager and will be removed in the future.
+    tcp {
+        port => "9999"
+    }
+}
+
+# This allows us to reformat the events/logs timestamps to the current manager time
+# This is meant to overcome timing issues with events coming in late or getting stuck in the queue.
+# It is only a temporary solution.
+filter {
+    date { match => [ "timestamp", "ISO8601" ] }
+
+    # Set context.operation field to the empty string by default
+    # this will be inserted as null below thanks to NULLIF
+    if ![context][operation] {
+        mutate {
+            add_field => {
+                "[context][operation]" => ""
+            }
+        }
+    }
+
+    # Set context.node_id field to the empty string by default
+    # this will be inserted as null below thanks to NULLIF
+    if ![context][node_id] {
+        mutate {
+            add_field => {
+                "[context][node_id]" => ""
+            }
+        }
+    }
+
+    # Set context.task_error_causes field to the empty string by default
+    # this will be inserted as null below thanks to NULLIF
+    if ![context][task_error_causes] {
+        mutate {
+            add_field => {
+                "[context][task_error_causes]" => ""
+            }
+        }
+    } else {
+        json_encode {
+            source => "[context][task_error_causes]"
+        }
+    }
+}
+
+
+output {
+    if "log" in [tags] {
+        jdbc {
+            driver_class => 'com.mysql.jdbc.Driver'
+            connection_string => 'jdbc:mysql://127.0.0.1:3306/SmartCMP_Orchestrator?user=cloudchef&password=c10udch3f&useSSL=false'
+            statement => [
+              "INSERT INTO logs (reported_timestamp, _execution_fk, _tenant_id, _creator_id, logger, level, message, message_code, operation, node_id) SELECT TIMESTAMP(?), _storage_id, _tenant_id, _creator_id, ?, ?, ?, ?, NULLIF(?, ''), NULLIF(?, '') FROM executions WHERE id = ?",
+              "@timestamp",
+              "[logger]",
+              "[level]",
+              "[message][text]",
+              "[message_code]",
+              "[context][operation]",
+              "[context][node_id]",
+              "[context][execution_id]"
+            ]
+        }
+    }
+
+    if "event" in [tags] {
+        jdbc {
+            driver_class => 'com.mysql.jdbc.Driver'
+            connection_string => 'jdbc:mysql://127.0.0.1:3306/SmartCMP_Orchestrator?user=cloudchef&password=c10udch3f&useSSL=false'
+            statement => [
+              "INSERT INTO events (reported_timestamp, _execution_fk, _tenant_id, _creator_id, event_type, message,  message_code, operation, node_id, error_causes) SELECT TIMESTAMP(?), _storage_id, _tenant_id, _creator_id, ?, ?, ?, NULLIF(?, ''), NULLIF(?, ''), NULLIF(?, '') FROM executions WHERE id = ?",
+              "@timestamp",
+              "[event_type]",
+              "[message][text]",
+              "[message_code]",
+              "[context][operation]",
+              "[context][node_id]",
+              "[context][task_error_causes]",
+              "[context][execution_id]"
+            ]
+        }
+    }
+
+    if "heartbeat" in [tags] {
+        file {
+            path => "/var/log/cloudchef/logstash/logstash-hearbeat.log"
+        }
+    }
+}
+
+############
+
+# 5、安装插件
+/usr/share/logstash/bin/logstash-plugin install file:///$(pwd)/logstash-filter-json_encode.zip
+/usr/share/logstash/bin/logstash-plugin install file:///$(pwd)/logstash-output-jdbc.zip
+
+# 6、复制jdbc mysql connector
+mkdir -p /usr/share/logstash/vendor/jar/jdbc
+\cp -f mysql-connector-java-8.0.16.jar  /usr/share/logstash/vendor/jar/jdbc
+
+# 7、创建logstash目录
+mkdir /opt/cloudchef/logstash
+chown -R logstash. /opt/cloudchef/logstash
+chown -R logstash. /var/log/cloudchef/logstash
+chown -R logstash. /usr/share/logstash/
+
+# 8、启动服务
+systemctl start logstash
+systemctl enable logstash
+
+# 9、检查服务
+grep " Connected to RabbitMQ" /var/log/cloudchef/logstash/logstash-plain.log
+// 检查回显Connected to RabbitMQ
+
+五、升级pushgateway
+
+# 1. 停止pushgateway服务
+systemctl stop cloudchef-pushgateway
+
+# 2. 备份老版本pushgateway
+rm -rf /opt/cloudchef/pushgateway-bak
+cp -r /opt/cloudchef/pushgateway /opt/cloudchef/pushgateway-bak
+
+# 3. 下载新包
+ pushgateway-1.4.1.linux-amd64.tar.gz
+
+# 4. 解压
+tar -zxf pushgateway-1.4.1.linux-amd64.tar.gz
+
+# 5. 替换新文件
+\cp -f pushgateway-1.4.1.linux-amd64/pushgateway /opt/cloudchef/pushgateway/
+
+# 6. 启动pushgateway
+systemctl start cloudchef-pushgateway
+
+# 7. 检查服务
+systemctl status cloudchef-pushgateway
+
+# 8. [慎重]服务正常后，删除备份的文件
+rm -rf /opt/cloudchef/pushgateway-bak
+
+# 9. 删除安装包
+rm -rf pushgateway-1.4.1.linux-amd64.tar.gz pushgateway-1.4.1.linux-amd64
+
+六、升级rabbtiMQ
+
+#方式一：(通过管理命令行工具)
+# 1.下载rabbitmqadmin并放入/usr/local/bin目录下
+curl -LO http://127.0.0.1:15672/cli/rabbitmqadmin
+mv rabbitmqadmin /usr/local/bin/
+
+# 2.赋予可执行权限
+chmod +x /usr/local/bin/rabbitmqadmin
+
+# 3.导出数据
+cd /usr/local/bin/
+/opt/mgmtworker/env/bin/python rabbitmqadmin -u cloudchef -p c10udch3f export rabbit.definitions.json
+
+# 4.停止服务
+systemctl stop cloudchef-tomcat
+systemctl stop celery-monitor
+systemctl stop cloudchef-mgmtworker
+systemctl stop logstash
+systemctl stop cloudchef-rabbitmq
+
+#5. 安装rpm
+rabbitmq-server-3.8.16-1.el7.noarch.rpm
+erlang-23.3.4-1.el7.x86_64.rpm
+
+yum -y install erlang-23.3.4-1.el7.x86_64.rpm
+yum -y install rabbitmq-server-3.8.16-1.el7.noarch.rpm
+
+#6.更新/etc/rabbitmq/rabbitmq.config内容
+
+/etc/rabbitmq/rabbitmq.config
+###################
+[
+ {ssl, [{versions, ['tlsv1.2', 'tlsv1.1']}]},
+ {rabbit, [
+           {loopback_users, []},
+           {consumer_timeout, 28800000},
+           {cluster_partition_handling, pause_minority},
+           {ssl_listeners, [5671]},
+           {ssl_options, [{cacertfile,"/etc/cloudify/ssl//cloudify_internal_cert.pem"},
+                          {certfile,  "/etc/cloudify/ssl//cloudify_internal_cert.pem"},
+                          {keyfile,   "/etc/cloudify/ssl//cloudify_internal_key.pem"},
+                          {versions, ['tlsv1.2', 'tlsv1.1']}
+                         ]}
+ ]},
+ {rabbitmq_management, [{load_definitions, "/etc/rabbitmq/definitions.json"}]}
+].
+####################
+
+#7.恢复配置备份
+# 启动rabbitmq服务
+systemctl start cloudchef-rabbitmq      // 需要三个节点都启动才能web访问15672端口
+# enable plugin
+rabbitmq-plugins enable rabbitmq_management
+// 开启15672端口和重新加载防火请配置，如果之前已经开启过了无需再次配置
+    # 开启15672端口，以便web访问
+    firewall-cmd --zone=public --add-port=15672/tcp --permanent
+    # 重新载入防火墙配置
+    firewall-cmd --reload
+# 恢复rabbitmq数据
+/opt/mgmtworker/env/bin/python rabbitmqadmin -u cloudchef -p c10udch3f -q import rabbit.definitions.json
+ 
+# 查看RabbitMQ现有用户，确认只存在cloudchef用户，且为Administrator
+rabbitmqctl list_users
+ 
+# 删除默认guest用户     //如果存在该用户则需要执行，不存在无需执行
+rabbitmqctl delete_user guest
+
+#8.启动服务 
+systemctl start cloudchef-mgmtworker
+systemctl start logstash
+systemctl start celery-monitor
+
+#9. 软连接添加
+ln -sf /etc/cloudchef/configs/celery-monitor/celery-monitor-env /etc/sysconfig/celery-monitor-env
+
+七、升级grafana
+#1、备份数据
+cp /var/lib/grafana/grafana.db /opt/grafana.db
+
+#2、创建数据库
+mysql -u root -p
+>create database SmartCMPGrafana;
+>create user 'cloudchef-grafana'@'%' IDENTIFIED by 'c10udch3f';
+>grant all on SmartCMPGrafana.* to 'cloudchef-grafana'@'%';
+>flush privileges;
+>exit
+#3、安装rpm
+# 停止grafana服务
+systemctl stop grafana-server
+
+grafana-7.4.2-1.x86_64.rpm
+
+# 升级grafana
+rpm -Uvh grafana-7.4.2-1.x86_64.rpm
+
+#4、   修改prometheus配置
+vi /etc/sysconfig/grafana-server
+############
+// 增加最后两行，其中 <prometheus_server_ip>替换成prometheus的IP地址
+
+GRAFANA_USER=grafana
+GRAFANA_GROUP=grafana
+GRAFANA_HOME=/usr/share/grafana
+LOG_DIR=/var/log/grafana
+DATA_DIR=/var/lib/grafana
+MAX_OPEN_FILES=10000
+CONF_DIR=/etc/grafana
+CONF_FILE=/etc/grafana/grafana.ini
+RESTART_ON_UPGRADE=true
+PLUGINS_DIR=/var/lib/grafana/plugins
+# Only used on systemd systems
+PID_FILE_DIR=/var/run/grafana
+PROMETHEUS_SERVER_URL=http://<prometheus_server_ip>:9090
+PROMETHEUS_RESOURCE_SERVER_URL=http://<prometheus_server_ip>:9089
+
+############
+
+#5、修改grafana.ini配置
+127.0.0.1改为MySQL的VIP
+localhost改为MySQL的VIP
+
+/*grafana访问域名*/改为CMP的VIP
+
+#6、加载插件
+grafana-plugins.tar.gz
+# 解压grafana plugins文件夹
+tar -zxvf grafana-plugins.tar.gz
+# 复制plugins到grafana plugins目录内
+cp -r plugins/* /var/lib/grafana/plugins/
+
+#7、修改主页
+sed -i '/<\/style>/i\.sidemenu{display:none!important;} .navbar{display: flex!important;} .navbar .css-rwrh9q,.navbar .navbar-page-btn{display:none!important;} .panel-title div{display:inline-block!important;} li[aria-label="Tab Transform"] { display: none!important; } li[aria-label="Tab Alert"] { display: none!important; } .css-1xwhpd8 .css-asgiz{display:none!important;}' /usr/share/grafana/public/views/index.html
+
+#8、重启服务
+systemctl daemon-reload
+systemctl restart grafana-server
+
+#9、添加数据源
+//其中 <prometheus_server_ip>替换成prometheus的IP地址
+curl -X POST -H "Content-Type: application/json" 'http://admin:c10udch3f@127.0.0.1:3000/api/datasources' -d '{"name": "prometheus", "type": "prometheus", "url": "http://<prometheus_server_ip>:9090", "access": "proxy", "basicAuth": false}'
+
+curl -X POST -H "Content-Type: application/json" 'http://admin:c10udch3f@127.0.0.1:3000/api/datasources' -d '{"name": "prometheus_long", "type": "prometheus", "url": "http://<prometheus_server_ip>:9089", "access": "proxy", "basicAuth": false}'
+
+curl -X POST -H "Content-Type: application/json" -d '{"name":"viewer","email":"","login":"viewer","password":"viewer"}' 'http://admin:c10udch3f@127.0.0.1:3000/api/admin/users'
+
+八、升级JDK
+
+# 关闭tomcat, report服务
+systemctl stop cloudchef-tomcat
+systemctl stop cloudchef-report
+ 
+# jdk升级
+curl -LO http://192.168.84.254:1688/smartcmp/upgrade/6.5.0/jdk-8u281-linux-x64.rpm
+rpm -Uvh jdk-8u281-linux-x64.rpm
+ 
+# 删除无用的软链接，防止命令执行报错
+rm -rf /etc/sysconfig/celery-monitor-env
+ 
+# 环境变量内容替换
+# HA其中一台执行完下面命令后，后续在其他节点执行时若出现"sed: no input files"，表示该环境变量是共享的，其他节点无需再执行该命令，若未出现则需要在其它节点继续执行）
+find /etc/ | xargs grep -ri "JAVA_HOME=/usr/java/jdk1.8.0_261" -l | xargs sed -i 's/0_261/0_281/g'     
+# 注：如若jdk的版本太低改命令可能会报找不到这个文件夹，需要先使用find /etc/ | xargs grep -ri "JAVA_HOME=/usr/java/jdk1.8.0" -l，找到对应的文件，然后打开查看当前版本，再将jdk1.8.0_261替换成当前版本
+ 
+
+九、升级tomcat
+apache-tomcat-9.0.43.tar.gz
+#解压tar包
+tar -zvxf apache-tomcat-9.0.43.tar.gz
+#拷贝到指定路径
+mv apache-tomcat-9.0.43 /opt/cloudchef/
+
+cd /opt/cloudchef
+mv tomcat tomcatbak
+mv report reportbak
+cp -r apache-tomcat-9.0.43 /opt/cloudchef/report
+mv apache-tomcat-9.0.43 tomcat
+#替换cmp tomcat
+cp /opt/cloudchef/tomcatbak/bin/setenv.sh /opt/cloudchef/tomcat/bin
+cp /opt/cloudchef/tomcatbak/lib/*.xml /opt/cloudchef/tomcat/lib
+// 会有提示是否覆盖log4j2.xml，选择n，不覆盖
+ 
+#覆盖context.xml和server.xml
+\cp /opt/cloudchef/tomcatbak/conf/{context.xml,server.xml} /opt/cloudchef/tomcat/conf/
+#替换webapps
+cd tomcat && rm -rf webapps
+cp -r /opt/cloudchef/tomcatbak/webapps /opt/cloudchef/tomcat/
+cd ..
+#替换report tomcat
+cp /opt/cloudchef/reportbak/bin/setenv.sh /opt/cloudchef/report/bin
+cp /opt/cloudchef/reportbak/lib/*.xml /opt/cloudchef/report/lib
+// 会有提示是否覆盖log4j2.xml，选择n，不覆盖
+ 
+#覆盖context.xml和server.xml
+\cp /opt/cloudchef/reportbak/conf/{context.xml,server.xml} /opt/cloudchef/report/conf/
+#替换webapps
+cd report && rm -rf webapps
+cp -r /opt/cloudchef/reportbak/webapps /opt/cloudchef/report/
+
+# 修改权限
+chown -R tomcat:tomcat /opt/cloudchef/tomcat
+chown -R tomcat:tomcat /opt/cloudchef/report
+chmod u+x /opt/cloudchef/tomcat/bin/*.sh
+chmod u+x /opt/cloudchef/report/bin/*.sh
+
+
+十、安装es
+elasticsearch-7.8.0-x86_64.rpm
+# 安装软件
+rpm --install elasticsearch-7.8.0-x86_64.rpm
+ 
+# 更新systemd配置文件
+sudo systemctl daemon-reload
+ 
+# 开机启动elasticsearch
+sudo systemctl enable elasticsearch.service
+ 
+# 设置堆内存为2G,
+vi /etc/elasticsearch/jvm.options.d/heap.options
+ 
+# 写入以下内容并保存, 根据实际配置修改，推荐为节点内存的一半
+-Xms2g
+-Xmx2g
+ 
+# 配置elasticsearch
+vi /etc/elasticsearch/elasticsearch.yml
+ 
+# 根据节点名称输入对应信息并保存
+###############开始#############
+cluster.name: cloudchef-elasticsearch
+# 节点名称，如果是第二个节点为es-node-2，第三个节点为es-node-3
+node.name: es-node-1
+ 
+# 指定当前节点的IP地址，如第一台192.168.88.82， 第二台192.168.88.83， 第三台192.168.88.84
+network.host: 192.168.88.82
+# 集群节点列表
+discovery.seed_hosts: ["192.168.88.82", "192.168.88.83", "192.168.88.84"]
+# 初始master-eligible节点列表
+cluster.initial_master_nodes: ["es-node-1", "es-node-2", "es-node-3"]
+###############结束#############
+ 
+# REST API端口
+firewall-cmd --zone=public --permanent --add-port=9200/tcp
+# 节点间通信端口
+firewall-cmd --zone=public --permanent --add-port=9300/tcp
+# 使配置生效
+firewall-cmd --reload
+ 
+# 启动
+systemctl start elasticsearch
+
+更新hosts解析
+vi /etc/hosts
+# 添加如下内容, 将所有es节点以“es-node-”为前缀命名
+192.168.88.83 es-node-1
+192.168.88.84 es-node-2
+192.168.88.85 es-node-3
+
+vi /opt/cloudchef/integration/config/env
+
+ES_HOSTS=192.168.88.83,192.168.88.84,192.168.88.85
+
+添加tomcat环境变量
+setenv.sh
+-Dspring.elasticsearch.rest.uris='http://192.168.88.83:9200,http://192.168.88.84:9200,http://192.168.88.85:9200'
+
+
+十一、升级prometheus
+# 1. 停止当前服务
+systemctl stop cloudchef-prometheus
+systemctl stop cloudchef-prometheus-resource
+# 2. 备份老版本prometheus
+rm -rf /opt/cloudchef/prometheus-bak
+cp -r /opt/cloudchef/prometheus /opt/cloudchef/prometheus-bak
+# 3. 下载新包
+ prometheus-2.18.1.linux-amd64.tar.gz
+# 4. 解压
+tar -zxf prometheus-2.18.1.linux-amd64.tar.gz
+# 5. 替换新文件
+rm -rf /opt/cloudchef/prometheus/consoles*
+rm -rf /opt/cloudchef/prometheus/console_libraries*
+\cp -rf prometheus-2.18.1.linux-amd64/prometheus /opt/cloudchef/prometheus/
+\cp -rf prometheus-2.18.1.linux-amd64/promtool /opt/cloudchef/prometheus/
+\cp -rf prometheus-2.18.1.linux-amd64/consoles /opt/cloudchef/prometheus/consoles
+\cp -rf prometheus-2.18.1.linux-amd64/consoles /opt/cloudchef/prometheus/consoles_resource
+\cp -rf prometheus-2.18.1.linux-amd64/console_libraries /opt/cloudchef/prometheus/
+\cp -rf prometheus-2.18.1.linux-amd64/console_libraries /opt/cloudchef/prometheus/console_libraries_resource
+# 6. 启动服务
+systemctl start cloudchef-prometheus
+systemctl start cloudchef-prometheus-resource
+# 7. 检查服务
+systemctl status cloudchef-prometheus
+systemctl status cloudchef-prometheus-resource
+# 8. [慎重]服务正常后，删除备份的文件
+rm -rf /opt/cloudchef/prometheus-bak
+# 9. 删除安装包
+rm -rf prometheus-2.18.1.linux-amd64.tar.gz prometheus-2.18.1.linux-amd64
+
+十二、升级alertmanager
+# 1. 停止当前服务
+systemctl stop cloudchef-alertmanager
+# 2. 备份老版本alertmanager
+rm -rf /opt/cloudchef/alertmanager-bak
+cp -r /opt/cloudchef/alertmanager /opt/cloudchef/alertmanager-bak
+# 3. 下载新包
+ alertmanager-0.19.0.linux-amd64.tar.gz
+# 4. 解压
+tar -zxf alertmanager-0.19.0.linux-amd64.tar.gz
+# 5. 替换新文件
+\cp -rf alertmanager-0.19.0.linux-amd64/alertmanager /opt/cloudchef/alertmanager/
+\cp -rf alertmanager-0.19.0.linux-amd64/amtool /opt/cloudchef/alertmanager/
+# 6. 启动alertmanager
+systemctl start cloudchef-alertmanager
+# 7. 检查服务
+systemctl status cloudchef-alertmanager
+# 8. [慎重]服务正常后，删除备份的文件
+rm -rf /opt/cloudchef/alertmanager-bak
+# 9. 删除安装包
+rm -rf alertmanager-0.19.0.linux-amd64.tar.gz alertmanager-0.19.0.linux-amd64
+
+十三、安装policy服务
+systemctl stop cloudchef-tomcat
+cd /opt/cloudchef/tomcat/webapps
+
+  policy.war
+
+# 添加tomcat的setenv环境变量：
+export ENV_MONITOR_SERVER_URL="http://127.0.0.1:9090"
+
+十四、安装celery-monitor 
+# 下载 
+  celery-monitor.tar.gz
+  
+# 解压
+tar -zxf celery-monitor.tar.gz
+  
+# 安装
+cd celery-monitor
+python install_celery_monitor.py
+# 安装成功后，会有"Install and start celery-monitor successfully!"字样输出
+  
+# 服务检查
+systemctl status celery-monitor
+
+十五、安装terraform
+#cd /usr/local/bin 
+
+ terraform_0.12.16_linux_amd64.zip
+
+#unzip terraform_0.12.16_linux_amd64.zip
+
+# 配置环境变量
+vi /etc/profile
+在最后一行添加：export TERRAFORM_HOME=/usr/local/bin/terraform
+保存后执行：source /etc/profile
+
+ terraform-plugins.tar.gz
+
+tar -zxf terraform-plugins.tar.gz -C /opt/manager/resources/
+
+十六、升级intergration
+1. 
+cd /opt/cloudchef/integration
+  
+2. # 删除 /opt/cloudchef/integration 目录下除了config文件夹外的所有文件
+ls | grep -v config | xargs rm -rf
+  
+3. # 下载最新py3版本代码包
+wget http://192.168.84.254:1688/build/cloudchef-integration/master/latest/cloudchef-integration.tar.gz
+  
+4. # 解压代码包
+tar -xzvf cloudchef-integration.tar.gz
+  
+5. # 执行更新脚本
+cd deploy && sh update.sh
+十七、升级component
+1：cd /opt/manager/resources/components/
+# 检查是否已经存在components，这个路径是系统默认的，也可以通过环境变量ENV_EXTENSIBLE_COMPONENTS_LOAD_PATH自定义路径
+# 可选操作，设置组件路径的环境变量,例如
+vi /opt/cloudchef/tomcat/bin/setenv.sh
+export ENV_EXTENSIBLE_COMPONENTS_LOAD_PATH=file:/opt/manager/resources/components/
+ 
+cd /opt/manager/resources
+rm -rf smartcmp-component.tar.gz
+rm -rf component/
+wget  http://192.168.84.254:1688/build/smartcmp-component/release_6.2.x/latest/smartcmp-component.tar.gz
+tar zxf smartcmp-component.tar.gz --no-same-owner
+# 必须带  --no-same-owner  参数！！！
+chown -R tomcat. /opt/manager/resources/components
+chown cfyuser.  /opt/manager/resources
+
+十八、升级mgmtworker
+步骤一：
+# 下载所需要分支的升级包
+smartcmp-mgmtworker.tar.gz
+tar -zxvf smartcmp-mgmtworker.tar.gz
+cd smartcmp-mgmtworker
+# 停止mgmtworker服务
+systemctl stop cloudchef-mgmtworker
+ 
+步骤二（判断是否已升级）：
+/opt/mgmtworker/env/bin/python -V
+  
+如果返回"Python 3.7.9"，您的系统已经升级到python3，执行步骤三
+  
+如果返回其他值，代表没有升级过python3，执行步骤四
+ 
+步骤三：
+sh update.sh
+  
+systemctl restart cloudchef-mgmtworker
+  
+# 检查状态
+systemctl status cloudchef-mgmtworker
+ 
+步骤四：
+mv /opt/mgmtworker/env /opt/mgmtworker/env_bak
+sh install.sh
+  
+systemctl restart cloudchef-mgmtworker
+  
+# 检查状态
+systemctl status cloudchef-mgmtworker
+
+十九、升级plugins
+
+mkdir -p /var/cc/plugins
+cd /var/cc/plugins
+rm -rf *
+
+ plugins.tar.gz
+
+
+/opt/mgmtworker/env/bin/python upload-plugin-tool.py -u abstract,aci,aliyun,ansible,aws,azure,docker,exporter,f5,host_pool,hyperv,kubernetes,nsx,openstack,physical,powervc,qingcloud,sdx,vsphere,fabric

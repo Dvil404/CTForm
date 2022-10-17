@@ -1,0 +1,108 @@
+{
+    "type": "object",
+    "properties": {
+        "sys_type": {
+            "id": "sys_type",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 0,
+            "title": "系统名称",
+            "config": {
+                "value": {
+                    "expression": "/groups?expand",
+                    "method": "GET",
+                    "source": "api"
+                },
+                "modification": {
+                    "allowInApproval": false
+                }
+            },
+            "selectDatas": [],
+            "required": true
+        },
+        "end_user": {
+            "type": "string",
+            "id": "end_user",
+            "title": "最终用户",
+            "config": {
+                "value": {
+                    "expression": "/users?expand",
+                    "method": "GET",
+                    "source": "api"
+                }
+            },
+            "index": 1,
+            "widget": {
+                "id": "select"
+            },
+            "selectDatas": [],
+            "required": true
+        },
+        "service_type": {
+            "id": "service_type",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 2,
+            "title": "服务类别",
+            "selectDatas": [
+                {
+                    "id": "业务上云",
+                    "name": "业务上云"
+                },
+                {
+                    "id": "资源变更",
+                    "name": "资源变更"
+                },
+                {
+                    "id": "信息查询",
+                    "name": "信息查询"
+                },
+                {
+                    "id": "故障报修",
+                    "name": "故障报修"
+                },
+                {
+                    "id": "备份还原",
+                    "name": "备份还原"
+                },
+                {
+                    "id": "投诉建议",
+                    "name": "投诉建议"
+                }
+            ],
+            "required": true
+        },
+        "schemaFormValid": {
+            "hidden": true,
+            "type": "boolean",
+            "default": false,
+            "condition": "1 === 2",
+            "widget": {
+                "id": "hidden"
+            }
+        }
+    },
+    "fieldsets": [
+        {
+            "id": "fieldset-default",
+            "title": "",
+            "description": "",
+            "name": "",
+            "fields": [
+                "end_user",
+                "sys_type",
+                "service_type",
+                "schemaFormValid"
+            ]
+        }
+    ],
+    "widget": {
+        "id": "object"
+    }
+}

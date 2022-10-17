@@ -1,0 +1,91 @@
+properties:
+  appLevel:
+    alias: 应用分级
+    type: string
+  RPO:
+    alias: RPO
+    type: string
+  RTO:
+    alias: RTO
+    type: string
+  monitorLevel:
+    alias: 监控级别（基础架构）
+    type: string
+  HASolution:
+    alias: 高可用解决方案
+    type: string
+  disasterLevel:
+    alias: 灾备等级级别
+    type: string
+  sysIspLevel:
+    alias: 系统等保级别
+    type: string
+  peakBusinessTime:
+    alias: 业务高峰时间
+    type: string
+  sysUserAmount:
+    alias: 系统用户数
+    type: integer
+  extSysList:
+    alias: 外联系统清单
+    type: string
+  developGroupName:
+    alias: 开发部门名称
+    type: string
+  devUser:
+    alias: 开发负责人
+    type: string
+  opsGroupName:
+    alias: 运维部门名称
+    type: string
+  supplierName:
+    alias: 供应商名称
+    type: string
+  supplierPerson:
+    alias: 供应商架构师
+    type: string
+  supplierProPerson:
+    alias: 供应商项目经理
+    type: string
+  constructionMethod:
+    alias: 建设方式
+    type: string
+  sysFunctionNote:
+    alias: 业务系统功能说明
+    type: string
+  dataSource:
+    alias: 数据库
+    type: string
+  middleware:
+    alias: 中间件
+    type: string
+  devPlatform:
+    alias: 开发平台
+    type: string
+  devLanguage:
+    alias: 开发语言
+    type: string
+  subUnits:
+    alias: 直属单位
+    type: string
+  businessUnits:
+    alias: 业务单位
+    type: string
+  sysdescription:
+    alias: 系统描述
+    type: string
+  downTime:
+    alias: 下线时间
+    type: string
+  description:
+    alias: 备注
+    type: stirng
+  responsibleUnit:
+    alias: 负责单位
+    type: string
+  specialItem:
+    alias: 是否国资委专项
+    type: string
+  devIspLevel:
+      alias: 等保定级
+      type: string

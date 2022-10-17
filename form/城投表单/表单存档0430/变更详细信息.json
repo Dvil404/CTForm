@@ -85,6 +85,28 @@
             "required": true,
             "options": []
         },
+        "sys_type": {
+            "id": "sys_types",
+            "type": "string",
+            "inputClass": "",
+            "index": 2,
+            "title": "系统名称",
+            "config": {
+                "value": {
+                    "expression": "/groups?expand",
+                    "method": "GET",
+                    "source": "api"
+                },
+                "modification": {
+                    "allowInApproval": false
+                }
+            },
+            "widget": {
+                "id": "select"
+            },
+            "selectDatas": [],
+            "required": true
+        },
         "start_time": {
             "id": "start_time",
             "type": "string",
@@ -102,7 +124,7 @@
             "formatType": "datetime",
             "enableTime": true,
             "inputClass": "",
-            "index": 2,
+            "index": 3,
             "title": "期望开始时间",
             "format": "yyyy-MM-dd HH:mm",
             "required": true
@@ -124,7 +146,7 @@
             "formatType": "datetime",
             "enableTime": true,
             "inputClass": "",
-            "index": 3,
+            "index": 4,
             "title": "期望结束时间",
             "format": "yyyy-MM-dd HH:mm",
             "required": true
@@ -144,7 +166,7 @@
                 "id": "select"
             },
             "inputClass": "",
-            "index": 4,
+            "index": 5,
             "title": "变更分类",
             "selectDatas": [
                 {
@@ -205,7 +227,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 5,
+            "index": 6,
             "title": "变更原因",
             "required": true,
             "validationMessage": "请输入变更原因"
@@ -225,7 +247,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 6,
+            "index": 7,
             "title": "变更方案",
             "required": true
         },
@@ -244,7 +266,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 7,
+            "index": 8,
             "title": "方案测试情况",
             "required": true
         },
@@ -263,7 +285,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 8,
+            "index": 9,
             "title": "回退方案",
             "required": true
         },
@@ -282,7 +304,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 9,
+            "index": 10,
             "title": "风险和影响评估",
             "required": true
         },
@@ -305,6 +327,7 @@
             "fields": [
                 "change_env",
                 "change_type",
+                "sys_type",
                 "start_time",
                 "end_time",
                 "change_sort",

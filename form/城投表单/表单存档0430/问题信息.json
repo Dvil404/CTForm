@@ -9,7 +9,7 @@
                 "id": "radios"
             },
             "inputClass": "",
-            "index": 1,
+            "index": 0,
             "title": "问题来源",
             "default": "内部分析",
             "selectDatas": [
@@ -33,6 +33,69 @@
             "required": true,
             "options": []
         },
+        "sys_type": {
+            "id": "sys_types",
+            "type": "string",
+            "inputClass": "",
+            "index": 1,
+            "title": "系统名称",
+            "config": {
+                "value": {
+                    "expression": "/groups?expand",
+                    "method": "GET",
+                    "source": "api"
+                }
+            },
+            "widget": {
+                "id": "select"
+            },
+            "selectDatas": [],
+            "required": true
+        },
+        "want_start_time": {
+            "id": "want_start_time",
+            "type": "string",
+            "config": {
+                "visibility": {
+                    "allowInRequest": true
+                },
+                "modification": {
+                    "allowInApproval": false
+                }
+            },
+            "widget": {
+                "id": "datetime"
+            },
+            "formatType": "datetime",
+            "enableTime": true,
+            "inputClass": "",
+            "index": 2,
+            "title": "期望开始时间",
+            "format": "yyyy-MM-dd HH:mm",
+            "required": true
+        },
+        "want_end_time": {
+            "id": "want_end_time",
+            "type": "string",
+            "config": {
+                "visibility": {
+                    "allowInRequest": true
+                },
+                "modification": {
+                    "allowInApproval": false
+                }
+            },
+            "widget": {
+                "id": "datetime"
+            },
+            "formatType": "datetime",
+            "enableTime": true,
+            "inputClass": "",
+            "index": 3,
+            "title": "期望结束时间",
+            "format": "yyyy-MM-dd HH:mm",
+            "required": true
+        },
         "trouble_affect": {
             "id": "trouble_affect",
             "type": "string",
@@ -40,7 +103,7 @@
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 5,
+            "index": 4,
             "title": "问题影响",
             "required": true
         },
@@ -51,7 +114,7 @@
                 "id": "select"
             },
             "inputClass": "",
-            "index": 6,
+            "index": 5,
             "title": "问题分类",
             "selectDatas": [
                 {
@@ -81,7 +144,7 @@
                 "id": "radios"
             },
             "inputClass": "",
-            "index": 1,
+            "index": 6,
             "title": "基础问题分类",
             "selectDatas": [
                 {
@@ -122,7 +185,7 @@
                 "id": "radios"
             },
             "inputClass": "",
-            "index": 1,
+            "index": 7,
             "title": "非基础问题分类",
             "selectDatas": [
                 {
@@ -167,7 +230,7 @@
                 "id": "radios"
             },
             "inputClass": "",
-            "index": 1,
+            "index": 8,
             "title": "物理安全隐患分类",
             "selectDatas": [
                 {
@@ -204,9 +267,57 @@
                 "id": "radios"
             },
             "inputClass": "",
-            "index": 1,
+            "index": 9,
             "title": "信息安全隐患分类",
             "selectDatas": [
+                {
+                    "id": "端口扫描",
+                    "name": "端口扫描"
+                },
+                {
+                    "id": "端口转发",
+                    "name": "端口转发"
+                },
+                {
+                    "id": "WebShell扫描",
+                    "name": "WebShell扫描"
+                },
+                {
+                    "id": "账号爆破攻击",
+                    "name": "账号爆破攻击"
+                },
+                {
+                    "id": "漏洞利用攻击",
+                    "name": "漏洞利用攻击"
+                },
+                {
+                    "id": "注入攻击",
+                    "name": "注入攻击"
+                },
+                {
+                    "id": "僵尸网络威胁",
+                    "name": "僵尸网络威胁"
+                },
+                {
+                    "id": "病毒攻击威胁",
+                    "name": "病毒攻击威胁"
+                },
+                {
+                    "id": "DDOS攻击威胁",
+                    "name": "DDOS攻击威胁"
+                },
+                {
+                    "id": "web明文传输威胁",
+                    "name": "web明文传输威胁"
+                },
+                {
+                    "id": "弱密码口令威胁",
+                    "name": "弱密码口令威胁"
+                },
+                {
+                    "id": "配置风险威胁",
+                    "name": "配置风险威胁"
+                },
                 {
                     "id": "漏洞风险隐患",
                     "name": "漏洞风险隐患"
@@ -218,14 +329,6 @@
                 {
                     "id": "IPS入侵隐患",
                     "name": "IPS入侵隐患"
-                },
-                {
-                    "id": "病毒攻击隐患",
-                    "name": "病毒攻击隐患"
-                },
-                {
-                    "id": "DDOS攻击隐患",
-                    "name": "DDOS攻击隐患"
                 },
                 {
                     "id": "SQL注入攻击隐患",
@@ -267,8 +370,11 @@
             "name": "",
             "fields": [
                 "trouble_source",
+                "sys_type",
                 "trouble_affect",
                 "trouble_classification",
+                "want_start_time",
+                "want_end_time",
                 "basic_trouble",
                 "nobasic_trouble",
                 "physical_trouble",

@@ -1,0 +1,58 @@
+{
+    "type": "object",
+    "properties": {
+        "apptype": {
+            "id": "apptype",
+            "type": "string",
+            "widget": {
+                "id": "select"
+            },
+            "inputClass": "",
+            "index": 0,
+            "title": "应用类型",
+            "selectDatas": [
+                {
+                    "id": "app",
+                    "name": "APP"
+                },
+                {
+                    "id": "db",
+                    "name": "DB"
+                },
+                {
+                    "id": "web",
+                    "name": "WEB"
+                },
+                {
+                    "id": "test",
+                    "name": "TEST"
+                }
+            ],
+            "required": true
+        },
+        "schemaFormValid": {
+            "hidden": true,
+            "type": "boolean",
+            "default": false,
+            "condition": "1 === 2",
+            "widget": {
+                "id": "hidden"
+            }
+        }
+    },
+    "fieldsets": [
+        {
+            "id": "fieldset-default",
+            "title": "",
+            "description": "",
+            "name": "",
+            "fields": [
+                "apptype",
+                "schemaFormValid"
+            ]
+        }
+    ],
+    "widget": {
+    "id": "object"
+    }
+}

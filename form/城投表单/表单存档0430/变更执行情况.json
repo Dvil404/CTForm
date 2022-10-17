@@ -18,7 +18,7 @@
             "formatType": "datetime",
             "enableTime": true,
             "inputClass": "",
-            "index": 2,
+            "index": 0,
             "title": "执行开始时间",
             "format": "yyyy-MM-dd HH:mm",
             "required": true
@@ -40,20 +40,43 @@
             "formatType": "datetime",
             "enableTime": true,
             "inputClass": "",
-            "index": 3,
+            "index": 1,
             "title": "执行结束时间",
             "format": "yyyy-MM-dd HH:mm",
             "required": true
         },
-        "aaa": {
-            "id": "aaa",
+        "action_result": {
+            "id": "action_result",
+            "align": "leftRight",
+            "type": "string",
+            "widget": {
+                "id": "radios"
+            },
+            "inputClass": "",
+            "index": 2,
+            "title": "执行结果",
+            "selectDatas": [
+                {
+                    "id": "成功",
+                    "name": "成功"
+                },
+                {
+                    "id": "失败",
+                    "name": "失败"
+                }
+            ],
+            "required": true,
+            "options": []
+        },
+        "actionnote": {
+            "id": "actionnote",
             "type": "string",
             "widget": {
                 "id": "textarea"
             },
             "inputClass": "",
-            "index": 2,
-            "title": "执行结果",
+            "index": 3,
+            "title": "执行记录",
             "required": true
         },
         "schemaFormValid": {
@@ -75,7 +98,8 @@
             "fields": [
                 "zhixing_start_time",
                 "zhixing_end_time",
-                "aaa",
+                "action_result",
+                "actionnote",
                 "schemaFormValid"
             ]
         }
